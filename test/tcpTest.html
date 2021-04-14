@@ -1,0 +1,21 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <title>Example Socket.IO</title>
+</head>
+<body>
+
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+<script src="http://127.0.0.1:9999/socket.io/socket.io.js"></script>
+<script type="text/javascript">
+var socket = io.connect('http://127.0.0.1:9999');
+// 'server'라는 이름의 메세지가 왔을때 
+socket.on('tickerPrice', function (data) {
+  $('#messages').append($('<li>').text('Received message: ' + data.stockData));
+});
+// 'client'라는 이름으로 메세지 송신
+socket.emit('client', { hello: 'world 2' });
+</script>
+Messages: <ul id="messages"></ul>
+</body>
+</html>

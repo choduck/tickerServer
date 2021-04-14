@@ -1,0 +1,95 @@
+<html>
+    <head>
+        <title>Info Stream (TEST)</title>
+        <link href="https://www.guriddo.net/demo/css/trirand/ui.jqgrid.css" rel="stylesheet"/>
+<link href="https://ajax.aspnetcdn.com/ajax/jquery.ui/1.11.1/themes/start/jquery-ui.css" rel="stylesheet"/>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+<script src="http://ajax.aspnetcdn.com/ajax/jquery.ui/1.10.4/jquery-ui.min.js"></script>
+<script src="http://www.guriddo.net/demo/js/trirand/jquery.jqGrid.min.js"></script>
+<script src="http://www.guriddo.net/demo/js/trirand/i18n/grid.locale-en.js"></script>
+                <script type="text/javascript">
+            var noSupportMessage = "Your browser cannot support WebSocket!";
+            var ws;
+
+            function appendMessage(message) {
+                $('body').append(message);
+            }
+
+            function connectSocketServer() {
+                var support = "MozWebSocket" in window ? 'MozWebSocket' : ("WebSocket" in window ? 'WebSocket' : null);
+
+                if (support === null) {
+                    appendMessage("* " + noSupportMessage + "<br/>");
+                    return;
+                }
+
+                appendMessage("* Connecting to server ..<br/>");
+                // create a new websocket and connect
+                ws = new window[support]('ws://127.0.0.1:9999/websocket');
+
+                // when data is comming from the server, this metod is called
+                ws.onmessage = function (evt) {
+                    console.log('evt====>',evt)
+                    makegrid(evt.data);
+                };
+
+                // when the connection is established, this method is called
+                ws.onopen = function () {
+                    appendMessage('* Connection open!!!<br/>');
+                };
+
+                // when the connection is closed, this method is called
+                ws.onclose = function () {
+                    appendMessage('* Connection closed<br/>');
+                };
+            }
+
+            function disconnectWebSocket() {
+                if (ws) {
+                    ws.close();
+                }
+            }
+
+            function connectWebSocket() {
+                connectSocketServer();
+            }
+
+
+
+            window.onload = function () {
+  connectWebSocket();
+  };
+
+  function makeGrid(data){
+    var json = [data]; // now this is local data
+     $("#list").jqGrid({
+            datastr: data, // so you should use datastr instead of url with localdata
+            datatype: "jsonstring", // and dataype should be jsonstring with local data
+            colNames: ["timestamp", "capcode", "parsedname", "message"],
+            colModel: [
+                { name: "timestamp", width: 400 },
+                { name: "capcode", width: 200 },
+                { name: "parsedname", width: 200, align: "right" },
+                { name: "message", width: 200, align: "right" }
+            ],
+            pager: "#pager",
+            rowNum: 10,
+            rowList: [10, 20, 30],
+            sortname: "invid",
+            sortorder: "desc",
+            viewrecords: true,
+            gridview: true,
+            autoencode: true,
+            caption: "Pager Messages"
+        }); 
+             };
+
+    </script>
+    </head>
+
+
+    <body>
+<table id='list'></table>
+<div id='pager'></div>
+    </body>
+</html>
